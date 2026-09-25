@@ -1,8 +1,9 @@
 # qb-medkit
 
-مورد QBCore يجعل استخدام `medkit` يعالج المستخدم نفسه. يزيد الصحة بمقدار
-100 نقطة (حتى الحد الأعلى)، ولا ينعش اللاعبين ولا يعتمد على نظام الإسعاف.
-يتحقق السيرفر من حالة اللاعب ووجود الآيتم، ثم يستهلك حبة واحدة عند نجاح العلاج.
+مورد QBCore مستقل للآيتم `medkit`: ينعش أقرب لاعب ميت أو في حالة `last stand`.
+يتحقق السيرفر من حالة اللاعبين والمسافة والآيتم، ثم يستهلك حبة واحدة عند نجاح
+الإنعاش. يستخدم المورد حدث الإنعاش الموجود في `qb-ambulancejob` ولا يضيف نظام
+مستشفى أو وظائف إسعاف جديدة.
 
 ## التثبيت
 
@@ -22,18 +23,18 @@
        ['useable'] = true,
        ['shouldClose'] = true,
        ['combinable'] = nil,
-       ['description'] = 'A medical kit that restores the user\'s health'
+       ['description'] = 'A professional medical kit used to revive unconscious players'
    },
    ```
 
 3. ضع صورة باسم `medkit.png` في مجلد صور الإنفنتوري، غالبًا:
    `qb-inventory/html/images/medkit.png`.
-4. تأكد من تشغيل `qb-core` و`progressbar` قبل هذا المورد. لا يحتاج
-   `qb-ambulancejob`. أضف إلى `server.cfg` بعد موارد QBCore:
+4. تأكد من تشغيل `qb-core` و`progressbar` و`qb-ambulancejob` قبل هذا المورد.
+   أضف إلى `server.cfg` بعد موارد QBCore:
 
    ```cfg
-   ensure qb-core
    ensure progressbar
+   ensure qb-ambulancejob
    ensure qb-medkit
    ```
 
@@ -41,14 +42,17 @@
 
 ## الاستخدام
 
-أضف `medkit` إلى الإنفنتوري واستخدمه على شخصيتك وأنت مصاب وغير ساقط. يستغرق
-العلاج 5 ثوانٍ ويمكن إلغاؤه. لا يعمل على اللاعب الميت أو في حالة `last stand`.
+أضف `medkit` إلى الإنفنتوري، واقترب من لاعب ميت أو في حالة `last stand`.
+استخدم الآيتم؛ سينفذ اللاعب حركة CPR لمدة 5 ثوانٍ، ويمكن إلغاؤها. عند اكتمالها
+يُستهلك `medkit` ويُرسل حدث الإنعاش للاعب المستهدف.
 
 للاختبار، أعطِ نفسك آيتمًا من أمر الإدارة المتوفر في سيرفرك، ثم استخدمه على
-شخصيتك بعد تلقي ضرر.
+لاعب آخر في حالة سقوط.
 
 ## التوافق والتعديل
 
-- المورد مخصص لـ QBCore ولا يتصل بأحداث الإسعاف أو الإنعاش.
-- غيّر `Config.HealAmount` لتعديل مقدار العلاج، و`Config.ProgressDuration`
-  لتعديل مدة الاستخدام في `config.lua`.
+- المورد مخصص لـ QBCore ويحتاج حدث الإنعاش `hospital:client:Revive` الافتراضي
+  في `qb-ambulancejob`.
+- غيّر `Config.TargetDistance` و`Config.ProgressDuration` وبيانات
+  `Config.Animation` في `config.lua` عند الحاجة. الحركة الافتراضية مطابقة لحركة
+  CPR المستخدمة في مورد `qb-ambulancejob`.
